@@ -114,23 +114,21 @@ class Collection(object):
                 if not fields:
                     fields = ["_id"]
                 fields = self._fields_list_to_dict(fields)
+        from collections import OrderedDict
 
         if isinstance(filter, (qf.sort, qf.hint, qf.explain, qf.snapshot)):
             if '$query' not in spec:
                 spec = {'$query': spec}
                 for k,v in filter.iteritems():
-                    spec['$' + k] = dict(v)
-
+                    spec['$' + k] = OrderedDict(v)
         if self._database.__authenticated :
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
         else :
             proto = yield self._database.connection.getprotocol()
-
         flags = kwargs.get('flags', 0)
         query = Query(flags=flags, collection=str(self),
                       n_to_skip=skip, n_to_return=limit,
                       query=spec, fields=fields)
-
         reply = yield proto.send_QUERY(query)
         documents = reply.documents
         while reply.cursor_id:

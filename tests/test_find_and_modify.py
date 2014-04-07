@@ -28,6 +28,7 @@ class TestFindAndModify(unittest.TestCase):
     @defer.inlineCallbacks
     def setUp(self):
         self.conn = yield txmongo.MongoConnection(mongo_host, mongo_port)
+        yield self.conn.mydb.authenticate('foo', 'bar')
         self.coll = self.conn.mydb.mycol
 
     @defer.inlineCallbacks

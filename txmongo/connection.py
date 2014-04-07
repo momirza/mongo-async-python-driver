@@ -263,7 +263,6 @@ class ConnectionPool(object):
         collection_name = database_name+'.$cmd'
         query = Query(collection=collection_name, query={'getnonce': 1})
         result = yield proto.send_QUERY(query)
-           
         result = result.documents[0].decode()
         
         if result["ok"] :
@@ -272,7 +271,7 @@ class ConnectionPool(object):
             defer.returnValue(result["errmsg"])
         
         key = auth._auth_key(nonce, name, password)
-        
+
         # hacky because order matters
         auth_command = SON(authenticate=1)
         auth_command['user'] = unicode(name)
@@ -289,7 +288,7 @@ class ConnectionPool(object):
             current_connection.auth_set.add(database_name)
             defer.returnValue(result["ok"])
         else:
-            del self.cred_cache[database_name]
+            # del self.cred_cache[database_name]
             defer.returnValue(result["errmsg"])
             
     def disconnect(self):
@@ -315,6 +314,7 @@ class ConnectionPool(object):
         if database_name not in connection.auth_set :
             name  = self.cred_cache[database_name][0]
             password = self.cred_cache[database_name][1]
+
             yield self.authenticate_with_nonce(database,name,password)
         else :
             self.__index = (self.__index + 1) % self.__pool_size
