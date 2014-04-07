@@ -42,7 +42,7 @@ class TestCollection(unittest.TestCase):
         self.conn = yield txmongo.MongoConnection(mongo_host, mongo_port)
         self.db = self.conn.mydb
         self.coll = self.db.mycol
-        yield self.db.authenticate('foo', 'bar')
+        # yield self.db.authenticate('foo', 'bar')
 
     @defer.inlineCallbacks
     def tearDown(self):

@@ -21,7 +21,7 @@ from txmongo.collection import Collection
 
 class Database(object):
     __factory = None
-    __authenticated = False
+    _authenticated = False
 
     def __init__(self, factory, database_name):
         self.__factory = factory
@@ -41,6 +41,10 @@ class Database(object):
 
     def __getattr__(self, collection_name):
         return self[collection_name]
+
+    @property
+    def is_authenticated(self):
+        return self._authenticated
 
     @property
     def connection(self):

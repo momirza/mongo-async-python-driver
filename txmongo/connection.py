@@ -256,7 +256,7 @@ class ConnectionPool(object):
     def authenticate_with_nonce (self,database,name,password) :
 
         database_name = str(database)
-        self.cred_cache[database_name] = (name,password)
+        self.cred_cache[database_name] = (name, password)
         current_connection = self.__pool[self.__index]
         proto = yield self.getprotocol()
 
@@ -265,9 +265,9 @@ class ConnectionPool(object):
         result = yield proto.send_QUERY(query)
         result = result.documents[0].decode()
         
-        if result["ok"] :
+        if result["ok"]:
             nonce = result["nonce"]
-        else :
+        else:
             defer.returnValue(result["errmsg"])
         
         key = auth._auth_key(nonce, name, password)
@@ -282,9 +282,8 @@ class ConnectionPool(object):
         result = yield proto.send_QUERY(query)
                 
         result = result.documents[0].decode()
-                
         if result["ok"]:
-            database.__authenticated = True
+            database._authenticated = True
             current_connection.auth_set.add(database_name)
             defer.returnValue(result["ok"])
         else:
@@ -310,13 +309,12 @@ class ConnectionPool(object):
         # Get the next protocol available for communication in the pool
         connection = self.__pool[self.__index]
         database_name = str(database)
-        
-        if database_name not in connection.auth_set :
-            name  = self.cred_cache[database_name][0]
+        if database_name not in connection.auth_set:
+            name = self.cred_cache[database_name][0]
             password = self.cred_cache[database_name][1]
 
-            yield self.authenticate_with_nonce(database,name,password)
-        else :
+            yield self.authenticate_with_nonce(database, name, password)
+        else:
             self.__index = (self.__index + 1) % self.__pool_size
 
         defer.returnValue(connection.instance)

@@ -121,10 +121,9 @@ class Collection(object):
                 spec = {'$query': spec}
                 for k,v in filter.iteritems():
                     spec['$' + k] = OrderedDict(v)
-
-        if self._database.__authenticated :
+        if self._database.is_authenticated:
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
-        else :
+        else:
             proto = yield self._database.connection.getprotocol()
         flags = kwargs.get('flags', 0)
         query = Query(flags=flags, collection=str(self),
@@ -232,7 +231,7 @@ class Collection(object):
         flags = kwargs.get('flags', 0)
         insert = Insert(flags=flags, collection=str(self), documents=docs)
 
-        if self._database.__authenticated :
+        if self._database.is_authenticated :
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
         else :
             proto = yield self._database.connection.getprotocol()
@@ -264,7 +263,7 @@ class Collection(object):
         document = bson.BSON.encode(document)
         update = Update(flags=flags, collection=str(self),
                         selector=spec, update=document)
-        if self._database.__authenticated :
+        if self._database.is_authenticated:
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
         else :
             proto = yield self._database.connection.getprotocol()
@@ -298,7 +297,7 @@ class Collection(object):
 
         spec = bson.BSON.encode(spec)
         delete = Delete(flags=flags, collection=str(self), selector=spec)
-        if self._database.__authenticated :
+        if self._database.is_authenticated:
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
         else :
             proto = yield self._database.connection.getprotocol()
@@ -339,7 +338,6 @@ class Collection(object):
 
         if "bucket_size" in kwargs:
             kwargs["bucketSize"] = kwargs.pop("bucket_size")
-
         index.update(kwargs)
         d = self._database.system.indexes.insert(index, safe=True)
         d.addCallback(wrapper, name)
