@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import OrderedDict
 import bson
 from bson import ObjectId
 from bson.code import Code
@@ -114,7 +115,6 @@ class Collection(object):
                 if not fields:
                     fields = ["_id"]
                 fields = self._fields_list_to_dict(fields)
-        from collections import OrderedDict
 
         if isinstance(filter, (qf.sort, qf.hint, qf.explain, qf.snapshot)):
             if '$query' not in spec:
