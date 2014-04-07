@@ -284,7 +284,7 @@ class ConnectionPool(object):
         result = result.documents[0].decode()
                 
         if result["ok"]:
-            database._authenticated = True
+            database.__authenticated = True
             current_connection.auth_set.add(database_name)
             defer.returnValue(result["ok"])
         else:

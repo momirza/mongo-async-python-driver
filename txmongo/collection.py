@@ -122,7 +122,7 @@ class Collection(object):
                 for k,v in filter.iteritems():
                     spec['$' + k] = OrderedDict(v)
 
-        if self._database._authenticated:
+        if self._database.__authenticated :
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
         else :
             proto = yield self._database.connection.getprotocol()
@@ -232,7 +232,7 @@ class Collection(object):
         flags = kwargs.get('flags', 0)
         insert = Insert(flags=flags, collection=str(self), documents=docs)
 
-        if self._database._authenticated :
+        if self._database.__authenticated :
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
         else :
             proto = yield self._database.connection.getprotocol()
@@ -264,7 +264,7 @@ class Collection(object):
         document = bson.BSON.encode(document)
         update = Update(flags=flags, collection=str(self),
                         selector=spec, update=document)
-        if self._database._authenticated :
+        if self._database.__authenticated :
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
         else :
             proto = yield self._database.connection.getprotocol()
@@ -298,7 +298,7 @@ class Collection(object):
 
         spec = bson.BSON.encode(spec)
         delete = Delete(flags=flags, collection=str(self), selector=spec)
-        if self._database._authenticated :
+        if self._database.__authenticated :
             proto = yield self._database.connection.get_authenticated_protocol(self._database)
         else :
             proto = yield self._database.connection.getprotocol()
