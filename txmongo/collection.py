@@ -121,10 +121,7 @@ class Collection(object):
                 spec = {'$query': spec}
                 for k,v in filter.iteritems():
                     spec['$' + k] = OrderedDict(v)
-        if self._database.is_authenticated:
-            proto = yield self._database.connection.get_authenticated_protocol(self._database)
-        else:
-            proto = yield self._database.connection.getprotocol()
+        proto = yield self._database.connection.get_authenticated_protocol(self._database)
         flags = kwargs.get('flags', 0)
         query = Query(flags=flags, collection=str(self),
                       n_to_skip=skip, n_to_return=limit,
@@ -230,11 +227,7 @@ class Collection(object):
         docs = [bson.BSON.encode(d) for d in docs]
         flags = kwargs.get('flags', 0)
         insert = Insert(flags=flags, collection=str(self), documents=docs)
-
-        if self._database.is_authenticated :
-            proto = yield self._database.connection.get_authenticated_protocol(self._database)
-        else :
-            proto = yield self._database.connection.getprotocol()
+        proto = yield self._database.connection.get_authenticated_protocol(self._database)
 
         proto.send_INSERT(insert)
 
@@ -263,10 +256,7 @@ class Collection(object):
         document = bson.BSON.encode(document)
         update = Update(flags=flags, collection=str(self),
                         selector=spec, update=document)
-        if self._database.is_authenticated:
-            proto = yield self._database.connection.get_authenticated_protocol(self._database)
-        else :
-            proto = yield self._database.connection.getprotocol()
+        proto = yield self._database.connection.get_authenticated_protocol(self._database)
 
         proto.send_UPDATE(update)
 
@@ -297,10 +287,7 @@ class Collection(object):
 
         spec = bson.BSON.encode(spec)
         delete = Delete(flags=flags, collection=str(self), selector=spec)
-        if self._database.is_authenticated:
-            proto = yield self._database.connection.get_authenticated_protocol(self._database)
-        else :
-            proto = yield self._database.connection.getprotocol()
+        proto = yield self._database.connection.get_authenticated_protocol(self._database)
 
         proto.send_DELETE(delete)
 

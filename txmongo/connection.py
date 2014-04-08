@@ -221,7 +221,7 @@ class ConnectionPool(object):
     __pool = None
     __pool_size = None
     __uri = None
-
+    requires_authentication = False
 
     def __init__(self, uri='mongodb://127.0.0.1:27017', pool_size=1):
         assert isinstance(uri, basestring)
@@ -230,7 +230,6 @@ class ConnectionPool(object):
 
         if not uri.startswith('mongodb://'):
             uri = 'mongodb://' + uri
-
         self.cred_cache = {}
         self.__uri = parse_uri(uri)
         self.__pool_size = pool_size
@@ -312,16 +311,19 @@ class ConnectionPool(object):
     def get_authenticated_protocol(self, database):
         # Get the next protocol available for communication in the pool
         connection = self.__pool[self.__index]
-        database_name = str(database)
-        if database_name not in connection.auth_set:
-            name = self.cred_cache[database_name][0]
-            password = self.cred_cache[database_name][1]
+        if self.requires_authentication:
+            database_name = str(database)
+            if database_name not in connection.auth_set:
+                name = self.cred_cache[database_name][0]
+                password = self.cred_cache[database_name][1]
 
-            yield self.authenticate_with_nonce(database, name, password)
-        else:
-            self.__index = (self.__index + 1) % self.__pool_size
+                yield self.authenticate_with_nonce(database, name, password)
+            else:
+                self.__index = (self.__index + 1) % self.__pool_size
 
-        defer.returnValue(connection.instance)
+            defer.returnValue(connection.instance)
+        protocol = yield self.getprotocol()
+        defer.returnValue(protocol)
 
     def getprotocol(self):
         # Get the next protocol available for communication in the pool.
@@ -345,10 +347,10 @@ class ConnectionPool(object):
 ###
 
 class MongoConnection(ConnectionPool):
-    def __init__(self, host, port, pool_size=1):
+    def __init__(self, host, port, pool_size=1, user=None, password=None):
         uri = 'mongodb://%s:%d/' % (host, port)
+        self.requires_authentication = bool(user and password)
         ConnectionPool.__init__(self, uri, pool_size=pool_size)
-
 
 lazyMongoConnectionPool = MongoConnection
 lazyMongoConnection = MongoConnection
