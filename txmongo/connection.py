@@ -232,6 +232,10 @@ class ConnectionPool(object):
             uri = 'mongodb://' + uri
         self.cred_cache = {}
         self.__uri = parse_uri(uri)
+        if self.__uri['username'] is not None and self.__uri['password'] is not None \
+                and self.__uri['database'] is not None:
+            self.requires_authentication = True
+            self.authenticate_with_nonce(self.__uri['database'], self.__uri['username'], self.__uri['password'])
         self.__pool_size = pool_size
         self.__pool = [_Connection(self, self.__uri, i) for i in
                        xrange(pool_size)]
