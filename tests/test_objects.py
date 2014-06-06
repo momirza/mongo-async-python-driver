@@ -30,7 +30,6 @@ mongo_host="localhost"
 mongo_port=27017
 base.DelayedCall.debug = False
 
-
 class TestMongoObjects(unittest.TestCase):
     @defer.inlineCallbacks
     def test_MongoObjects(self):
@@ -47,7 +46,7 @@ class TestMongoObjects(unittest.TestCase):
         """ Tests mongo operations """
         conn = yield txmongo.MongoConnection(mongo_host, mongo_port)
         test = conn.foo.test
-        
+
         # insert
         doc = {"foo":"bar", "items":[1, 2, 3]}
         yield test.insert(doc, safe=True)
@@ -55,7 +54,7 @@ class TestMongoObjects(unittest.TestCase):
         self.assertEqual(result.has_key("_id"), True)
         self.assertEqual(result["foo"], "bar")
         self.assertEqual(result["items"], [1, 2, 3])
-        
+
         # insert preserves object id
         doc.update({'_id': objectid.ObjectId()})
         yield test.insert(doc, safe=True)
@@ -129,31 +128,31 @@ class TestGridFsObjects(unittest.TestCase):
     def _disconnect(self, conn):
         """ Disconnect the connection """
         yield conn.disconnect()
-    
+
     @defer.inlineCallbacks
     def test_GridFsObjects(self):
         """ Tests gridfs objects """
         conn = yield txmongo.MongoConnection(mongo_host, mongo_port)
         db = conn.test
         collection = db.fs
-        
+
         gfs = gridfs.GridFS(db) # Default collection
-        
+
         gridin = GridIn(collection, filename='test', contentType="text/plain",
                         chunk_size=2**2**2**2)
         new_file = gfs.new_file(filename='test2', contentType="text/plain",
                         chunk_size=2**2**2**2)
-        
+
         # disconnect
         yield conn.disconnect()
-        
+
     @defer.inlineCallbacks
     def test_GridFsOperations(self):
         """ Tests gridfs operations """
         conn = yield txmongo.MongoConnection(mongo_host, mongo_port)
         db = conn.test
         collection = db.fs
-        
+
         # Don't forget to disconnect
         self.addCleanup(self._disconnect, conn)
         try:
@@ -163,7 +162,7 @@ class TestGridFsObjects(unittest.TestCase):
             self.fail("Failed to create memory files for testing: %s" % e)
 
         g_out = None
-        
+
         try:
             # Tests writing to a new gridfs file
             gfs = gridfs.GridFS(db) # Default collection
@@ -172,7 +171,7 @@ class TestGridFsObjects(unittest.TestCase):
             # yielding to ensure writes complete before we close and close before we try to read
             yield g_in.write(in_file.read())
             yield g_in.close()
-            
+
             # Tests reading from an existing gridfs file
             g_out = yield gfs.get_last_version('optest')
             data = yield g_out.read()
@@ -183,18 +182,18 @@ class TestGridFsObjects(unittest.TestCase):
                       "Is MongoDB running? %s" % e)
         else:
             self.assertEqual(in_file.getvalue(), out_file.getvalue(),
-                         "Could not read the value from writing an input")        
+                         "Could not read the value from writing an input")
         finally:
             in_file.close()
             out_file.close()
             if g_out:
                 g_out.close()
 
-        
+
         listed_files = yield gfs.list()
         self.assertEqual(['optest'], listed_files,
                          "'optest' is the only expected file and we received %s" % listed_files)
-        
+
         yield gfs.delete(_id)
 
 if __name__ == "__main__":
