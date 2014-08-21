@@ -28,7 +28,6 @@ from twisted.internet import base, defer
 
 mongo_host="localhost"
 mongo_port=27017
-base.DelayedCall.debug = False
 
 class TestMongoObjects(unittest.TestCase):
     @defer.inlineCallbacks
@@ -154,7 +153,6 @@ class TestGridFsObjects(unittest.TestCase):
         collection = db.fs
 
         # Don't forget to disconnect
-        self.addCleanup(self._disconnect, conn)
         try:
             in_file = StringIO("Test input string")
             out_file = StringIO()
@@ -195,6 +193,8 @@ class TestGridFsObjects(unittest.TestCase):
                          "'optest' is the only expected file and we received %s" % listed_files)
 
         yield gfs.delete(_id)
+        yield conn.disconnect()
+
 
 if __name__ == "__main__":
     suite = runner.TrialSuite((TestMongoObjects, TestGridFsObjects))
