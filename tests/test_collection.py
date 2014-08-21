@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+8# -*- coding: utf-8 -*-
 
 # Copyright 2012 Renzo S.
 #
@@ -80,7 +80,7 @@ class TestCollection(unittest.TestCase):
         self.assertFailure(self.db.test.update({}, {}, 'a'), TypeError)
 
         self.assert_(isinstance(self.db.test, Collection))
-        self.assertEqual(-1, cmp(self.db.test, 7))
+        self.assertNotEqual(cmp(self.db.test, 7), 0)
         self.assertEqual(self.db.test, Collection(self.db, "test"))
         self.assertEqual(self.db.test.mike, self.db["test.mike"])
         self.assertEqual(self.db.test["mike"], self.db["test.mike"])

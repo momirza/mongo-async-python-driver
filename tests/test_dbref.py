@@ -52,7 +52,10 @@ class TestDBRef(unittest.TestCase):
         ref2 = DBRef('b', oid)
 
         self.assertEqual(cmp(ref1, ref2), -1)
-        self.assertEqual(cmp(ref1, 0), -1)
+
+        ## python chooses a default winner when __cmp__ returns NotImplemented
+        # so assert ref1 and 0 (arbitrary int) are not equal
+        self.assertNotEqual(cmp(ref1, 0), 0)
 
         ref1 = DBRef('a', oid)
         ref2 = DBRef('a', oid)
