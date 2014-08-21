@@ -299,7 +299,7 @@ class ConnectionPool(object):
             # del self.cred_cache[database_name]
             defer.returnValue(result["errmsg"])
 
-    def disconnect(self):
+    def disconnect(self, delay=0):
         for factory in self.__pool:
             factory.stopTrying()
             factory.stopFactory()
@@ -310,7 +310,7 @@ class ConnectionPool(object):
         # Wait for the next iteration of the loop for resolvers
         # to potentially cleanup.
         df = defer.Deferred()
-        reactor.callLater(0, df.callback, None)
+        reactor.callLater(delay, df.callback, None)
         return df
 
     @defer.inlineCallbacks
@@ -356,7 +356,7 @@ class MongoConnection(ConnectionPool):
     def __init__(self, host, port, pool_size=1, user=None, password=None):
         uri = 'mongodb://%s:%d/' % (host, port)
         self.requires_authentication = bool(user and password)
-        ConnectionPool.__init__(self, uri, pool_size=pool_size)
+        super(MongoConnection, self).__init__(uri, pool_size=pool_size)
 
 lazyMongoConnectionPool = MongoConnection
 lazyMongoConnection = MongoConnection

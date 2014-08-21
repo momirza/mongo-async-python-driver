@@ -38,7 +38,7 @@ class TestMongoObjects(unittest.TestCase):
         self.assertEqual(isinstance(mydb, database.Database), True)
         mycol = mydb.mycol
         self.assertEqual(isinstance(mycol, collection.Collection), True)
-        yield conn.disconnect()
+        yield conn.disconnect(delay=0.05)
 
     @defer.inlineCallbacks
     def test_MongoOperations(self):
@@ -143,7 +143,7 @@ class TestGridFsObjects(unittest.TestCase):
                         chunk_size=2**2**2**2)
 
         # disconnect
-        yield conn.disconnect()
+        yield conn.disconnect(delay=0.05)
 
     @defer.inlineCallbacks
     def test_GridFsOperations(self):
